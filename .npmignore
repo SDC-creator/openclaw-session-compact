@@ -1,0 +1,11 @@
+node_modules/
+src/
+*.log
+.env
+.DS_Store
+test-*.ts
+*.tmp
+*.md
+!README.md
+!SKILL.md
+!DEVELOPMENT.md

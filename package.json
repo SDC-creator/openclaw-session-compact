@@ -1,0 +1,38 @@
+{
+  "name": "openclaw-session-compact",
+  "version": "1.0.0",
+  "description": "Smart session compaction plugin for OpenClaw to manage token usage and support unlimited conversation length.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo 'Run manual test: node bin/test.js compact-status'",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "openclaw",
+    "skill",
+    "session",
+    "compaction",
+    "token-management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "openclaw": "^2026.3.28"
+  },
+  "openclaw": {
+    "name": "Session Compact",
+    "version": "1.0.0",
+    "description": "Automatically compresses session history to manage token limits.",
+    "entry": "dist/index.js"
+  }
+}
