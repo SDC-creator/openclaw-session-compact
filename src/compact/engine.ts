@@ -105,7 +105,7 @@ export function estimateTokenCount(messages: Array<{ content?: string }>): numbe
 /**
  * 从消息中自动提取时间线（Claw Code 风格：不依赖 LLM）
  */
-function extractTimelineFromMessages(messages: Array<{ role: string; content?: string }>): string {
+export function extractTimelineFromMessages(messages: Array<{ role: string; content?: string }>): string {
   const timeline = messages
     .slice(-10)
     .filter(m => m.content && m.content.trim().length > 5)
@@ -130,7 +130,7 @@ function extractSummaryContent(response: string): string {
 /**
  * 验证摘要是否包含关键结构
  */
-function validateSummary(summary: string): boolean {
+export function validateSummary(summary: string): boolean {
   const requiredFields = ['Scope:', 'Pending work:', 'Key files:'];
   return requiredFields.every(field => summary.includes(field));
 }
