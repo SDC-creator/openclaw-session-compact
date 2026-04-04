@@ -138,7 +138,7 @@ function validateSummary(summary: string): boolean {
 /**
  * 提取摘要中的关键点（用于合并）
  */
-function extractSummaryHighlights(summary: string): string[] {
+export function extractSummaryHighlights(summary: string): string[] {
   const match = summary.match(/<summary>([\s\S]*?)<\/summary>/);
   const content = match ? match[1] : summary;
   const lines = content.split('\n')
@@ -150,7 +150,7 @@ function extractSummaryHighlights(summary: string): string[] {
 /**
  * 提取时间线（用于合并）
  */
-function extractTimeline(summary: string): string[] {
+export function extractTimeline(summary: string): string[] {
   const match = summary.match(/- Key timeline:\s*([\s\S]*?)(?:\n\n|$)/);
   if (!match) return [];
   return match[1]
