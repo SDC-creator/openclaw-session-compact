@@ -241,4 +241,4 @@ MIT License
 **Tests**: ✅ 65/65 Passing  
 **Coverage**: 📈 63.63%  
 **Version**: v1.0.0  
-**Maintainer**: OpenClaw Team
+**Maintainer**: SDC-creator

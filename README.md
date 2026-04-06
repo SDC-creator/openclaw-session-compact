@@ -332,6 +332,6 @@ MIT License
 **Project Status**: ✅ Stable Release  
 **Tests**: ✅ 65/65 Passing  
 **Coverage**: 📈 63.63%  
-**Maintainer**: OpenClaw Team
+**Maintainer**: SDC-creator
 
 **Chinese Documentation**: [SKILL_CN.md](SKILL_CN.md)

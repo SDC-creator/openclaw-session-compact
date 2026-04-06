@@ -272,4 +272,4 @@ MIT License
 **版本**：v1.0.0  
 **状态**：✅ 稳定发布  
 **测试**：✅ 65/65 通过  
-**维护者**：OpenClaw Team
+**维护者**：SDC-creator
