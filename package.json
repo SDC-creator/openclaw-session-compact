@@ -41,7 +41,13 @@
     "name": "Session Compact",
     "version": "1.0.0",
     "description": "Automatically compresses session history to manage token limits.",
-    "extensions": ["./dist/index.js"]
+    "extensions": ["./dist/index.js"],
+    "compat": {
+      "pluginApi": ">=2026.4.2"
+    },
+    "build": {
+      "openclawVersion": "2026.4.5"
+    }
   },
   "jest": {
     "preset": "ts-jest",
