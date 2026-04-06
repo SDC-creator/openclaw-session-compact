@@ -250,5 +250,71 @@ $ openclaw compact-config
 
 ---
 
+## ClawHub Publishing Issues
+
+### Issue 7: Package Name Collides with Existing Skill Slug
+
+**Error**: `Package name collides with existing skill slug "openclaw-session-compact"`
+
+**Cause**: We previously published as a skill (`clawhub publish`), which created a skill slug. Code plugins and skills share the same namespace.
+
+**Solution**: Delete the old skill first, then publish as a code plugin:
+```bash
+clawhub delete openclaw-session-compact --yes
+clawhub package publish . --family code-plugin --source-repo ... --source-commit ... --version 1.0.0
+```
+
+### Issue 8: Missing `openclaw.compat.pluginApi`
+
+**Error**: `package.json openclaw.compat.pluginApi is required`
+
+**Cause**: ClawHub code plugins require compatibility metadata.
+
+**Solution**: Add to `package.json`:
+```json
+{
+  "openclaw": {
+    "compat": {
+      "pluginApi": ">=2026.4.2"
+    }
+  }
+}
+```
+
+### Issue 9: Missing `openclaw.build.openclawVersion`
+
+**Error**: `package.json openclaw.build.openclawVersion is required`
+
+**Cause**: ClawHub needs to know which OpenClaw version the plugin was built with.
+
+**Solution**: Add to `package.json`:
+```json
+{
+  "openclaw": {
+    "build": {
+      "openclawVersion": "2026.4.5"
+    }
+  }
+}
+```
+
+### Issue 10: `clawhub install` Doesn't Support Code Plugins Yet
+
+**Error**: `Skill not found` when running `clawhub install openclaw-session-compact`
+
+**Cause**: `clawhub install` is designed for skills (SKILL.md), not code plugins. Code plugins need manual installation.
+
+**Solution**: Manual installation:
+```bash
+git clone https://github.com/SDC-creator/openclaw-session-compact.git \
+  ~/.openclaw/extensions/openclaw-session-compact
+cd ~/.openclaw/extensions/openclaw-session-compact
+npm install --production
+```
+
+---
+
 *Document created: 2026-04-06*
+*Last updated: 2026-04-07*
 *OpenClaw version: 2026.4.5*
+*ClawHub CLI version: 0.9.0*

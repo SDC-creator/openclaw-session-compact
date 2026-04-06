@@ -15,12 +15,23 @@ Intelligent session compression plugin for OpenClaw that automatically manages t
 
 ### 1. Installation
 
-```bash
-# Install from ClawHub
-openclaw skills install openclaw-session-compact
+**From ClawHub** (recommended):
 
-# Or install from local path
-openclaw skills install /Users/lab/.openclaw/workspace/skills/openclaw-session-compact
+```bash
+# Install the code plugin
+clawhub install openclaw-session-compact
+```
+
+**Manual installation** (if ClawHub install doesn't support code plugins yet):
+
+```bash
+# Clone or download the plugin
+git clone https://github.com/SDC-creator/openclaw-session-compact.git \
+  ~/.openclaw/extensions/openclaw-session-compact
+
+# Install dependencies
+cd ~/.openclaw/extensions/openclaw-session-compact
+npm install --production
 ```
 
 ### 2. Plugin Configuration
@@ -250,7 +261,7 @@ function estimateTokenCount(
 
 ```bash
 # Navigate to project
-cd /Users/lab/.openclaw/workspace/skills/openclaw-session-compact
+cd /Users/lab/.openclaw/workspace/skills/session-compact
 
 # Install dependencies
 npm install
@@ -277,7 +288,7 @@ openclaw-session-compact/
 │   ├── compact/
 │   │   ├── config.ts         # Configuration management
 │   │   ├── engine.ts         # Core compression logic
-│   │   └── __tests__/        # Unit tests (65 tests, 63.63% coverage)
+│   │   └── __tests__/        # Unit tests (94 tests, 94.65% coverage)
 │   │       ├── config.test.ts
 │   │       ├── engine.test.ts
 │   │       ├── engine-integration.test.ts
@@ -306,15 +317,62 @@ This project is an **OpenClaw plugin** (not just a workspace skill). Key differe
 ### Adding New Features
 
 1. Add new function in `src/compact/engine.ts`
-2. Add corresponding test in `src/compact/__tests__/`
+2. Add corresponding test in `src/compact/__tests__/` or `src/__tests__/`
 3. Run `npm run test:coverage` to ensure coverage doesn't decrease
 4. Update `README.md` documentation
 5. Rebuild: `npm run build`
-6. Sync to extensions: copy `dist/`, `src/`, `package.json` to `~/.openclaw/extensions/openclaw-session-compact/`
+6. Sync to extensions: copy `dist/`, `package.json`, `openclaw.plugin.json` to `~/.openclaw/extensions/openclaw-session-compact/`
+
+## 📦 Publishing to ClawHub
+
+### Prerequisites
+
+1. **Login to ClawHub**: `clawhub login` (GitHub OAuth)
+2. **Verify identity**: `clawhub whoami`
+
+### Publish as Code Plugin
+
+```bash
+# Build first
+npm run build
+
+# Publish to ClawHub
+clawhub package publish . \
+  --family code-plugin \
+  --source-repo SDC-creator/openclaw-session-compact \
+  --source-commit $(git rev-parse HEAD) \
+  --version 1.0.0 \
+  --changelog "Your changelog here" \
+  --tags latest
+```
+
+### Required `package.json` Fields
+
+```json
+{
+  "name": "openclaw-session-compact",
+  "version": "1.0.0",
+  "openclaw": {
+    "extensions": ["./dist/index.js"],
+    "compat": {
+      "pluginApi": ">=2026.4.2"
+    },
+    "build": {
+      "openclawVersion": "2026.4.5"
+    }
+  }
+}
+```
+
+### Verify Publication
+
+```bash
+clawhub package inspect openclaw-session-compact
+```
 
 ## 📈 Performance Metrics
 
-- **Test Coverage**: 63.63% (target 70%+)
+- **Test Coverage**: 94.65% (94 tests passing)
 - **Core Function Coverage**: 89.76%
 - **Average Compression Time**: < 1 second (without LLM)
 - **Token Savings**: Typically 85-95%
@@ -369,9 +427,10 @@ openclaw compact-config max_tokens 1000
 
 ### v1.0.0 (2026-04-06)
 - ✨ Initial release
-- ✅ 65 unit tests passing
+- ✅ 94 unit tests passing (94.65% coverage)
 - ✅ CLI commands: `compact`, `compact-status`, `compact-config`
 - ✅ Plugin architecture with `api.registerCli()`
+- ✅ Published to ClawHub as code plugin
 - ✅ Compression functionality verified
 - ✅ Fallback mechanism validated
 - 📚 Complete documentation
@@ -393,8 +452,9 @@ MIT License
 ---
 
 **Project Status**: ✅ Stable Release
-**Tests**: ✅ 65/65 Passing
-**Coverage**: 📈 63.63%
+**Tests**: ✅ 94/94 Passing
+**Coverage**: 📈 94.65%
+**ClawHub**: ✅ Published (openclaw-session-compact@1.0.0)
 **Maintainer**: SDC-creator
 
 **Chinese Documentation**: [SKILL_CN.md](SKILL_CN.md)

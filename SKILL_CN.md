@@ -6,9 +6,19 @@
 
 ### 安装
 
+**从 ClawHub 安装**（推荐）：
+
 ```bash
-# 从 ClawHub 安装
-openclaw skills install openclaw-session-compact
+clawhub install openclaw-session-compact
+```
+
+**手动安装**：
+
+```bash
+git clone https://github.com/SDC-creator/openclaw-session-compact.git \
+  ~/.openclaw/extensions/openclaw-session-compact
+cd ~/.openclaw/extensions/openclaw-session-compact
+npm install --production
 ```
 
 ### 配置
@@ -187,7 +197,7 @@ openclaw plugins list | grep compact
 
 ## 📈 性能指标
 
-- **测试覆盖率**: 63.63% (65 个测试通过)
+- **测试覆盖率**: 94.65% (94 个测试通过)
 - **核心功能覆盖**: 89.76%
 - **平均压缩时间**: < 1 秒 (无 LLM 调用)
 - **Token 节省**: 通常 85-95%
@@ -237,7 +247,8 @@ MIT License
 ---
 
 **项目状态**: ✅ 稳定发布
-**测试状态**: ✅ 65/65 通过
-**覆盖率**: 📈 63.63%
+**测试状态**: ✅ 94/94 通过
+**覆盖率**: 📈 94.65%
+**ClawHub**: ✅ 已发布 (openclaw-session-compact@1.0.0)
 **版本**: v1.0.0
 **维护者**: SDC-creator

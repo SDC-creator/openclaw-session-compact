@@ -12,9 +12,19 @@ Intelligent session compression plugin for OpenClaw that automatically manages t
 
 ### Installation
 
+**From ClawHub** (recommended):
+
 ```bash
-# Install from ClawHub
-openclaw skills install openclaw-session-compact
+clawhub install openclaw-session-compact
+```
+
+**Manual installation**:
+
+```bash
+git clone https://github.com/SDC-creator/openclaw-session-compact.git \
+  ~/.openclaw/extensions/openclaw-session-compact
+cd ~/.openclaw/extensions/openclaw-session-compact
+npm install --production
 ```
 
 ### Configuration
@@ -193,7 +203,7 @@ openclaw plugins list | grep compact
 
 ## 📈 Performance Metrics
 
-- **Test Coverage**: 63.63% (65 tests passing)
+- **Test Coverage**: 94.65% (94 tests passing)
 - **Core Function Coverage**: 89.76%
 - **Average Compression Time**: < 1 second (without LLM)
 - **Token Savings**: Typically 85-95%
@@ -243,7 +253,8 @@ MIT License
 ---
 
 **Status**: ✅ Stable Release
-**Tests**: ✅ 65/65 Passing
-**Coverage**: 📈 63.63%
+**Tests**: ✅ 94/94 Passing
+**Coverage**: 📈 94.65%
+**ClawHub**: ✅ Published (openclaw-session-compact@1.0.0)
 **Version**: v1.0.0
 **Maintainer**: SDC-creator

@@ -21,6 +21,10 @@
   - Installed to `~/.openclaw/extensions/openclaw-session-compact/`
   - Uses `api.registerCli()` for CLI command registration
   - Proper `openclaw.plugin.json` manifest with `id`, `cli`, and `configSchema`
+- **ClawHub Publication**: Published as a code plugin on ClawHub.
+  - `clawhub package publish` with `--family code-plugin`
+  - Source-linked verification with GitHub repo
+  - Compatibility metadata: `pluginApi >= 2026.4.2`, `builtWith 2026.4.5`
 - **Token Efficiency**: Achieves up to 97% token reduction while preserving critical context.
 - **LLM Robustness**: Handles timeout, API errors, and JSON parsing failures gracefully.
 - **Type Safety**: Full TypeScript support with strict mode enabled.
@@ -30,8 +34,9 @@
 
 - Comprehensive `SKILL.md` with YAML frontmatter for OpenClaw skill discovery.
 - `SKILL_CN.md` with complete Chinese documentation.
-- `README.md` with quick start, API docs, and troubleshooting.
+- `README.md` with quick start, API docs, ClawHub publishing guide, and troubleshooting.
 - `DEVELOPMENT.md` with plugin architecture guide and development workflow.
+- `TROUBLESHOOTING.md` documenting all 6 issues encountered and how they were fixed.
 - `QWEN.md` with project context and key learnings.
 
 ### 🐛 Bug Fixes
@@ -41,6 +46,8 @@
 - Fixed recursive merge to preserve event order across multiple compactions.
 - Fixed shell injection vulnerability in LLM command execution.
 - Fixed version mismatch between `_meta.json` (0.1.0) and `package.json` (1.0.0).
+- Fixed `package.json` key from `openclaw.entry` to `openclaw.extensions`.
+- Fixed export format from `skill` object to `register(api)` function.
 
 ### 🔒 Security
 
@@ -61,12 +68,19 @@
 
 ### 🚀 Installation
 
-```bash
-# From ClawHub
-openclaw skills install openclaw-session-compact
+**From ClawHub** (recommended):
 
-# From local path
-openclaw skills install /Users/lab/.openclaw/workspace/skills/openclaw-session-compact
+```bash
+clawhub install openclaw-session-compact
+```
+
+**Manual installation**:
+
+```bash
+git clone https://github.com/SDC-creator/openclaw-session-compact.git \
+  ~/.openclaw/extensions/openclaw-session-compact
+cd ~/.openclaw/extensions/openclaw-session-compact
+npm install --production
 ```
 
 ### ⚙️ Configuration
@@ -113,9 +127,9 @@ openclaw compact-config
 
 ### 📈 Performance Metrics
 
-- **Test Coverage**: 63.63% (target 70%+)
+- **Test Coverage**: 94.65% (94 tests passing)
 - **Core Function Coverage**: 89.76%
-- **Tests**: 65/65 passing
+- **Tests**: 94/94 passing (6 test suites)
 - **Average Compression Time**: < 1 second (without LLM)
 - **Token Savings**: Typically 85-95%
 
@@ -123,16 +137,16 @@ openclaw compact-config
 
 - [ ] Integrate with actual OpenClaw session storage (replace mock data)
 - [ ] Optimize LLM calls (use direct API instead of CLI exec)
-- [ ] Increase test coverage to 70%+
-- [ ] Add unit tests for CLI registration
 - [ ] Support custom compression strategies
 - [ ] Add performance metrics and logging
 - [ ] Add vector database support for semantic search of compressed history
-- [ ] Publish to GitHub with automated release workflow
+- [ ] Add progress indicator (Spinner) for long compressions
 
 ---
 
-**Full Changelog**: [View commits](https://github.com/your-org/openclaw-session-compact/commits/main)
+**Full Changelog**: [View commits](https://github.com/SDC-creator/openclaw-session-compact/commits/main)
+
+**ClawHub Package**: [openclaw-session-compact@1.0.0](https://clawhub.com/packages/openclaw-session-compact)
 
 **License**: MIT
 
