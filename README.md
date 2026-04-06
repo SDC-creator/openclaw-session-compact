@@ -1,4 +1,4 @@
-# OpenClaw Session Compact Skill 🔄
+# OpenClaw Session Compact Plugin 🔄
 
 Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports **unlimited-length conversations**. By automatically compressing historical messages into structured summaries, it significantly reduces token usage (typically 85-95% savings).
 
@@ -9,63 +9,88 @@ Intelligent session compression plugin for OpenClaw that automatically manages t
 - **Seamless Continuation**: Conversations continue without user intervention
 - **Fallback Protection**: Code-based extraction when LLM unavailable
 - **Recursive Compression**: Supports multiple compression cycles
+- **CLI Commands**: `openclaw compact`, `openclaw compact-status`, `openclaw compact-config`
 
 ## 🚀 Quick Start
 
 ### 1. Installation
 
-**Recommended - Install via ClawHub:**
 ```bash
-npx clawhub@latest install openclaw-session-compact
+# Install from ClawHub
+openclaw skills install openclaw-session-compact
+
+# Or install from local path
+openclaw skills install /Users/lab/.openclaw/workspace/skills/openclaw-session-compact
 ```
 
-**Alternative - Install from GitHub:**
-```bash
-openclaw skills install https://github.com/SDC-creator/openclaw-session-compact
+### 2. Plugin Configuration
+
+The plugin is automatically discovered from `~/.openclaw/extensions/openclaw-session-compact/`.
+
+Add to `~/.openclaw/openclaw.json`:
+
+```json
+{
+  "plugins": {
+    "allow": ["openclaw-session-compact"],
+    "entries": {
+      "openclaw-session-compact": {
+        "enabled": true
+      }
+    }
+  }
+}
 ```
 
-**Local Development:**
-```bash
-openclaw skills install /path/to/session-compact
-```
-
-### 2. Configuration
+### 3. Compression Configuration
 
 Add to `~/.openclaw/openclaw.json`:
 
 ```json
 {
   "skills": {
-    "session-compact": {
-      "enabled": true,
-      "max_tokens": 10000,
-      "preserve_recent": 4,
-      "auto_compact": true,
-      "model": "qwen/qwen3.5-122b-a10b"
+    "entries": {
+      "openclaw-session-compact": {
+        "enabled": true,
+        "max_tokens": 10000,
+        "preserve_recent": 4,
+        "auto_compact": true,
+        "model": "qwen/qwen3.5-122b-a10b"
+      }
     }
   }
 }
 ```
 
-### 3. Usage
+### 4. Usage
+
+**CLI Commands**:
+
+```bash
+# Check current session status
+openclaw compact-status
+
+# Manually compress current session
+openclaw compact
+
+# Force compression (ignores threshold)
+openclaw compact --force
+
+# View configuration
+openclaw compact-config
+
+# View specific config value
+openclaw compact-config max_tokens
+
+# Set config value (not persisted)
+openclaw compact-config max_tokens 5000
+```
 
 **Automatic Mode** (Recommended):
 ```bash
 # Start OpenClaw - compression works automatically
 openclaw start
 # Auto-compresses when conversation exceeds threshold
-```
-
-**Manual Trigger**:
-```bash
-# Compress current session
-openclaw compact --session-id <session-id>
-
-# Check compression status
-openclaw compact --status --session-id <session-id>
-
-# Force compression (ignores threshold)
-openclaw compact --force --session-id <session-id>
 ```
 
 ## 📊 How It Works
@@ -224,8 +249,8 @@ function estimateTokenCount(
 ### Local Development
 
 ```bash
-# Clone project
-cd /Users/lab/.openclaw/workspace/skills/session-compact
+# Navigate to project
+cd /Users/lab/.openclaw/workspace/skills/openclaw-session-compact
 
 # Install dependencies
 npm install
@@ -246,9 +271,9 @@ npm run test:coverage
 ### Project Structure
 
 ```
-session-compact/
+openclaw-session-compact/
 ├── src/
-│   ├── index.ts              # Skill entry point
+│   ├── index.ts              # Plugin entry point (register function)
 │   ├── compact/
 │   │   ├── config.ts         # Configuration management
 │   │   ├── engine.ts         # Core compression logic
@@ -258,11 +283,25 @@ session-compact/
 │   │       ├── engine-integration.test.ts
 │   │       └── engine-mock.test.ts
 │   └── cli/
-│       └── register.ts       # CLI command registration
+│       └── register.ts       # CLI command registration (legacy)
+├── bin/
+│   └── openclaw-compact.js   # Standalone CLI entry point
 ├── package.json
+├── openclaw.plugin.json      # OpenClaw plugin manifest
 ├── tsconfig.json
 └── README.md
 ```
+
+### Plugin Architecture
+
+This project is an **OpenClaw plugin** (not just a workspace skill). Key differences:
+
+| Aspect | Workspace Skill | Plugin |
+|--------|----------------|--------|
+| Location | `workspace/skills/` | `~/.openclaw/extensions/` |
+| Purpose | Documentation for LLM | Executable code |
+| Entry | `SKILL.md` with frontmatter | `dist/index.js` with `register()` |
+| CLI | Not supported | Supported via `api.registerCli()` |
 
 ### Adding New Features
 
@@ -270,6 +309,8 @@ session-compact/
 2. Add corresponding test in `src/compact/__tests__/`
 3. Run `npm run test:coverage` to ensure coverage doesn't decrease
 4. Update `README.md` documentation
+5. Rebuild: `npm run build`
+6. Sync to extensions: copy `dist/`, `src/`, `package.json` to `~/.openclaw/extensions/openclaw-session-compact/`
 
 ## 📈 Performance Metrics
 
@@ -281,16 +322,29 @@ session-compact/
 
 ## 🐛 Troubleshooting
 
+### Issue: Plugin Not Recognized
+
+**Cause**: Missing plugin configuration
+**Solution**:
+```bash
+# Check plugin status
+openclaw plugins list | grep compact
+
+# Ensure plugin is in plugins.allow
+# Add to openclaw.json:
+# "plugins": { "allow": ["openclaw-session-compact"] }
+```
+
 ### Issue: Compression Not Triggered
 
 **Cause**: Token count below threshold
 **Solution**:
 ```bash
 # Check current token usage
-openclaw compact --status
+openclaw compact-status
 
 # Lower threshold for testing
-openclaw compact --max-tokens 1000
+openclaw compact-config max_tokens 1000
 ```
 
 ### Issue: Poor Summary Quality
@@ -315,8 +369,9 @@ openclaw compact --max-tokens 1000
 
 ### v1.0.0 (2026-04-06)
 - ✨ Initial release
-- ✅ Published on ClawHub: https://clawhub.ai/sdc-creator/openclaw-session-compact
 - ✅ 65 unit tests passing
+- ✅ CLI commands: `compact`, `compact-status`, `compact-config`
+- ✅ Plugin architecture with `api.registerCli()`
 - ✅ Compression functionality verified
 - ✅ Fallback mechanism validated
 - 📚 Complete documentation
@@ -337,9 +392,9 @@ MIT License
 
 ---
 
-**Project Status**: ✅ Stable Release  
-**Tests**: ✅ 65/65 Passing  
-**Coverage**: 📈 63.63%  
+**Project Status**: ✅ Stable Release
+**Tests**: ✅ 65/65 Passing
+**Coverage**: 📈 63.63%
 **Maintainer**: SDC-creator
 
 **Chinese Documentation**: [SKILL_CN.md](SKILL_CN.md)

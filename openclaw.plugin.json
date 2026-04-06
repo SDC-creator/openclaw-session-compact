@@ -1,0 +1,9 @@
+{
+  "id": "openclaw-session-compact",
+  "cli": ["compact", "compact-status", "compact-config"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

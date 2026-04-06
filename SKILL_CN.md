@@ -1,4 +1,4 @@
-# OpenClaw Session Compact Skill 🔄
+# OpenClaw Session Compact Plugin 🔄
 
 智能会话压缩插件，自动管理 Token 消耗，支持**无限长对话**。通过自动压缩历史消息，将长对话压缩为结构化摘要，显著降低 Token 使用量（通常节省 85-95%）。
 
@@ -6,19 +6,9 @@
 
 ### 安装
 
-**推荐 - 通过 ClawHub 安装：**
 ```bash
-npx clawhub@latest install openclaw-session-compact
-```
-
-**备选 - 从 GitHub 安装：**
-```bash
-openclaw skills install https://github.com/SDC-creator/openclaw-session-compact
-```
-
-**本地开发：**
-```bash
-openclaw skills install /path/to/session-compact
+# 从 ClawHub 安装
+openclaw skills install openclaw-session-compact
 ```
 
 ### 配置
@@ -27,13 +17,21 @@ openclaw skills install /path/to/session-compact
 
 ```json
 {
+  "plugins": {
+    "allow": ["openclaw-session-compact"],
+    "entries": {
+      "openclaw-session-compact": { "enabled": true }
+    }
+  },
   "skills": {
-    "session-compact": {
-      "enabled": true,
-      "max_tokens": 10000,
-      "preserve_recent": 4,
-      "auto_compact": true,
-      "model": "qwen/qwen3.5-122b-a10b"
+    "entries": {
+      "openclaw-session-compact": {
+        "enabled": true,
+        "max_tokens": 10000,
+        "preserve_recent": 4,
+        "auto_compact": true,
+        "model": "qwen/qwen3.5-122b-a10b"
+      }
     }
   }
 }
@@ -41,7 +39,23 @@ openclaw skills install /path/to/session-compact
 
 ## 💡 使用场景
 
-### 场景 1: 自动压缩（推荐）
+### 场景 1: CLI 命令
+
+```bash
+# 查看当前会话状态
+openclaw compact-status
+
+# 手动触发压缩
+openclaw compact
+
+# 强制压缩（忽略阈值）
+openclaw compact --force
+
+# 查看配置
+openclaw compact-config
+```
+
+### 场景 2: 自动压缩
 
 ```bash
 # 启动 OpenClaw，压缩功能自动生效
@@ -49,19 +63,6 @@ openclaw start
 
 # 当对话历史超过阈值时，自动压缩并继续
 # 用户无感知，对话无缝继续
-```
-
-### 场景 2: 手动压缩
-
-```bash
-# 查看当前会话状态
-openclaw compact --status --session-id <session-id>
-
-# 手动触发压缩
-openclaw compact --session-id <session-id>
-
-# 强制压缩（忽略阈值）
-openclaw compact --force --session-id <session-id>
 ```
 
 ### 场景 3: 长对话场景
@@ -83,7 +84,6 @@ openclaw compact --force --session-id <session-id>
 
 | 参数 | 类型 | 默认值 | 说明 | 推荐值 |
 |------|------|--------|------|--------|
-| `enabled` | boolean | true | 是否启用技能 | true |
 | `max_tokens` | number | 10000 | 触发压缩的 Token 阈值 | 5000-20000 |
 | `preserve_recent` | number | 4 | 保留最近 N 条消息 | 4-6 |
 | `auto_compact` | boolean | true | 是否自动压缩 | true |
@@ -150,10 +150,10 @@ openclaw compact --force --session-id <session-id>
 **解决**:
 ```bash
 # 检查当前 Token 使用
-openclaw compact --status
+openclaw compact-status
 
-# 降低阈值测试
-openclaw compact --max-tokens 1000
+# 强制压缩测试
+openclaw compact --force
 ```
 
 #### 2. 摘要质量差
@@ -174,20 +174,15 @@ openclaw compact --max-tokens 1000
 }
 ```
 
-#### 4. `OpenClaw CLI not found`
+#### 4. 插件未被识别
 
-**原因**: OpenClaw 未安装或未添加到 PATH
+**原因**: 插件配置缺失
 **解决**:
 ```bash
-openclaw --version  # 确认命令可用
-```
+# 检查插件状态
+openclaw plugins list | grep compact
 
-#### 5. `Gateway connection failed`
-
-**原因**: OpenClaw Gateway 未运行
-**解决**:
-```bash
-openclaw gateway start
+# 确保 openclaw.json 中 plugins.allow 包含 openclaw-session-compact
 ```
 
 ## 📈 性能指标
@@ -206,9 +201,6 @@ npm test
 
 # 查看覆盖率
 npm run test:coverage
-
-# 压缩功能实测
-node test-compression.mjs
 ```
 
 ## 📚 技术文档
@@ -244,8 +236,8 @@ MIT License
 
 ---
 
-**项目状态**: ✅ 稳定发布  
-**测试状态**: ✅ 65/65 通过  
-**覆盖率**: 📈 63.63%  
-**版本**: v1.0.0  
+**项目状态**: ✅ 稳定发布
+**测试状态**: ✅ 65/65 通过
+**覆盖率**: 📈 63.63%
+**版本**: v1.0.0
 **维护者**: SDC-creator

@@ -1,24 +1,20 @@
-# OpenClaw Session Compact Skill 🔄
+---
+name: openclaw-session-compact
+description: |
+  Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports unlimited-length conversations. Compresses historical messages into structured summaries to reduce token usage by 85-95%. Provides CLI commands: compact, compact-status, compact-config.
+---
 
-Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports **unlimited-length conversations**.
+# OpenClaw Session Compact Plugin
+
+Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports **unlimited-length conversations**. By automatically compressing historical messages into structured summaries, it significantly reduces token usage (typically 85-95% savings).
 
 ## 🚀 Quick Start
 
 ### Installation
 
-**Recommended - Install via ClawHub:**
 ```bash
-npx clawhub@latest install openclaw-session-compact
-```
-
-**Alternative - Install from GitHub:**
-```bash
-openclaw skills install https://github.com/SDC-creator/openclaw-session-compact
-```
-
-**Local Development:**
-```bash
-openclaw skills install /path/to/session-compact
+# Install from ClawHub
+openclaw skills install openclaw-session-compact
 ```
 
 ### Configuration
@@ -27,13 +23,21 @@ Add to `~/.openclaw/openclaw.json`:
 
 ```json
 {
+  "plugins": {
+    "allow": ["openclaw-session-compact"],
+    "entries": {
+      "openclaw-session-compact": { "enabled": true }
+    }
+  },
   "skills": {
-    "session-compact": {
-      "enabled": true,
-      "max_tokens": 10000,
-      "preserve_recent": 4,
-      "auto_compact": true,
-      "model": "qwen/qwen3.5-122b-a10b"
+    "entries": {
+      "openclaw-session-compact": {
+        "enabled": true,
+        "max_tokens": 10000,
+        "preserve_recent": 4,
+        "auto_compact": true,
+        "model": "qwen/qwen3.5-122b-a10b"
+      }
     }
   }
 }
@@ -41,7 +45,23 @@ Add to `~/.openclaw/openclaw.json`:
 
 ## 💡 Usage Scenarios
 
-### Scenario 1: Automatic Compression (Recommended)
+### Scenario 1: CLI Commands
+
+```bash
+# Check current session status
+openclaw compact-status
+
+# Manually trigger compression
+openclaw compact
+
+# Force compression (ignores threshold)
+openclaw compact --force
+
+# View configuration
+openclaw compact-config
+```
+
+### Scenario 2: Automatic Compression
 
 ```bash
 # Start OpenClaw - compression works automatically
@@ -49,19 +69,6 @@ openclaw start
 
 # When conversation history exceeds the threshold, it auto-compresses
 # and continues seamlessly without user intervention
-```
-
-### Scenario 2: Manual Compression
-
-```bash
-# Check current session status
-openclaw compact --status --session-id <session-id>
-
-# Manually trigger compression
-openclaw compact --session-id <session-id>
-
-# Force compression (ignores threshold)
-openclaw compact --force --session-id <session-id>
 ```
 
 ### Scenario 3: Long Conversation Handling
@@ -83,7 +90,6 @@ After:  5 messages (360 tokens) - 92% token savings
 
 | Parameter | Type | Default | Description | Recommended |
 |-----------|------|---------|-------------|-------------|
-| `enabled` | boolean | true | Enable the skill | true |
 | `max_tokens` | number | 10000 | Token threshold for compression | 5000-20000 |
 | `preserve_recent` | number | 4 | Number of recent messages to keep | 4-6 |
 | `auto_compact` | boolean | true | Enable automatic compression | true |
@@ -150,10 +156,10 @@ When LLM is unavailable, automatically falls back to **code extraction** mode:
 **Solution**:
 ```bash
 # Check current token usage
-openclaw compact --status
+openclaw compact-status
 
 # Lower threshold for testing
-openclaw compact --max-tokens 1000
+openclaw compact --force
 ```
 
 #### 2. Poor Summary Quality
@@ -174,20 +180,15 @@ openclaw compact --max-tokens 1000
 }
 ```
 
-#### 4. `OpenClaw CLI not found`
+#### 4. Plugin Not Recognized
 
-**Cause**: OpenClaw not installed or not in PATH
+**Cause**: Missing plugin configuration
 **Solution**:
 ```bash
-openclaw --version  # Verify command availability
-```
+# Check plugin status
+openclaw plugins list | grep compact
 
-#### 5. `Gateway connection failed`
-
-**Cause**: OpenClaw Gateway not running
-**Solution**:
-```bash
-openclaw gateway start
+# Ensure plugin is in plugins.allow in openclaw.json
 ```
 
 ## 📈 Performance Metrics
@@ -206,9 +207,6 @@ npm test
 
 # Check coverage
 npm run test:coverage
-
-# Compression functionality test
-node test-compression.mjs
 ```
 
 ## 📚 Technical Documentation
@@ -244,8 +242,8 @@ MIT License
 
 ---
 
-**Status**: ✅ Stable Release  
-**Tests**: ✅ 65/65 Passing  
-**Coverage**: 📈 63.63%  
-**Version**: v1.0.0  
+**Status**: ✅ Stable Release
+**Tests**: ✅ 65/65 Passing
+**Coverage**: 📈 63.63%
+**Version**: v1.0.0
 **Maintainer**: SDC-creator
