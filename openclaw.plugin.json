@@ -1,6 +1,6 @@
 {
   "id": "openclaw-session-compact",
-  "cli": ["compact", "compact-status", "compact-config"],
+  "cli": ["compact", "compact-status", "compact-config", "sessions", "session-info"],
   "configSchema": {
     "type": "object",
     "additionalProperties": false,

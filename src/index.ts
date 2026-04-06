@@ -4,8 +4,24 @@ import {
   compactSession,
   estimateTokenCount,
   shouldCompact,
-  getCurrentModel
+  getCurrentModel,
+  calculateActualTokenUsage
 } from './compact/engine.js';
+import {
+  createSessionManager,
+  SessionManager,
+  SessionState
+} from './compact/session-manager.js';
+import { createSessionStore } from './compact/session-store.js';
+import {
+  ConversationMessage,
+  TokenUsage,
+  Session,
+  createUserMessage,
+  createAssistantMessage,
+  createToolResultMessage,
+  createSystemMessage
+} from './compact/types.js';
 
 // Mock session messages (TODO: integrate with actual OpenClaw session storage)
 function getCurrentSessionMessages(): Array<{ role: string; content?: string }> {
@@ -107,13 +123,74 @@ export function register(api: any) {
 
           console.log(`⚙️  Setting ${key} = ${value} (not persisted yet)`);
         });
+
+      // sessions command - list all sessions
+      program
+        .command('sessions')
+        .description('List all saved sessions')
+        .action(() => {
+          try {
+            const store = createSessionStore();
+            const sessions = store.listSessions();
+
+            if (sessions.length === 0) {
+              console.log('📭 No saved sessions found.');
+              return;
+            }
+
+            console.log('📚 Saved Sessions');
+            console.log('────────────────────────────────────');
+            sessions.forEach(s => {
+              const totalTokens = s.total_input_tokens + s.total_output_tokens + s.total_cache_tokens;
+              console.log(`  ${s.session_id}`);
+              console.log(`    Messages: ${s.message_count}, Tokens: ${totalTokens.toLocaleString()}, Compactions: ${s.compaction_count}`);
+              console.log(`    Updated: ${new Date(s.updated_at).toLocaleString()}`);
+            });
+          } catch (error) {
+            console.error('❌ Failed to list sessions:', error);
+          }
+        });
+
+      // session-info command - show current session details
+      program
+        .command('session-info')
+        .description('Show detailed session information')
+        .option('--session-id <id>', 'Session ID')
+        .action((opts: any) => {
+          const messages = getCurrentSessionMessages();
+          const estimatedTokens = estimateTokenCount(messages);
+          const actualUsage = calculateActualTokenUsage(messages as any);
+          const totalTokens = actualUsage.input_tokens + actualUsage.output_tokens +
+                            actualUsage.cache_creation_input_tokens + actualUsage.cache_read_input_tokens;
+          const needsCompact = shouldCompact(messages, config);
+
+          console.log('📊 Session Information');
+          console.log('────────────────────────────────────');
+          console.log(`  Session ID:      ${opts?.sessionId || 'current (mock)'}`);
+          console.log(`  Messages:        ${messages.length}`);
+          console.log('');
+          console.log('  Token Estimates:');
+          console.log(`    Estimated:     ${estimatedTokens.toLocaleString()}`);
+          console.log(`    Actual Input:  ${actualUsage.input_tokens.toLocaleString()}`);
+          console.log(`    Actual Output: ${actualUsage.output_tokens.toLocaleString()}`);
+          console.log(`    Actual Cache:  ${(actualUsage.cache_creation_input_tokens + actualUsage.cache_read_input_tokens).toLocaleString()}`);
+          console.log(`    Total Actual:  ${totalTokens.toLocaleString()}`);
+          console.log('');
+          console.log('  Configuration:');
+          console.log(`    Threshold:     ${config.max_tokens.toLocaleString()}`);
+          console.log(`    Usage:         ${Math.round((estimatedTokens / config.max_tokens) * 100)}%`);
+          console.log(`    Needs Compact: ${needsCompact ? '⚠️ Yes' : '✅ No'}`);
+          console.log(`    Auto Compact:  ${config.auto_compact ? 'Enabled' : 'Disabled'}`);
+        });
     },
     {
-      commands: ['compact', 'compact-status', 'compact-config'],
+      commands: ['compact', 'compact-status', 'compact-config', 'sessions', 'session-info'],
       descriptors: [
         { name: 'compact', description: 'Manually compact the current session history to save tokens' },
         { name: 'compact-status', description: 'Show current session token usage and compression status' },
         { name: 'compact-config', description: 'Show or update compact configuration' },
+        { name: 'sessions', description: 'List all saved sessions' },
+        { name: 'session-info', description: 'Show detailed session information' },
       ]
     }
   );
@@ -121,4 +198,31 @@ export function register(api: any) {
 
 // Export types and core functions for programmatic use
 export type { CompactConfig } from './compact/config.js';
-export { generateSummary, estimateTokenCount, compactSession } from './compact/engine.js';
+export {
+  generateSummary,
+  estimateTokenCount,
+  compactSession,
+  calculateActualTokenUsage
+} from './compact/engine.js';
+export {
+  SessionManager,
+  SessionState,
+  createSessionManager
+} from './compact/session-manager.js';
+export {
+  SessionStore,
+  createSessionStore
+} from './compact/session-store.js';
+export {
+  ConversationMessage,
+  TokenUsage,
+  Session,
+  ContentBlock,
+  MessageRole,
+  SessionMetadata,
+  createUserMessage,
+  createAssistantMessage,
+  createToolResultMessage,
+  createSystemMessage,
+  calculateTotalTokens
+} from './compact/types.js';

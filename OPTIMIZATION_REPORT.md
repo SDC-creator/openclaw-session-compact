@@ -94,7 +94,7 @@
 
 1. **初始化 Git 仓库**:
    ```bash
-   cd /Users/lab/.openclaw/workspace/skills/session-compact
+   cd <project-root>
    git init
    git add .
    git commit -m "feat: Implement safe fallback and recursive summary merge (Claw Code inspired)"

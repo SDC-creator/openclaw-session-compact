@@ -1,4 +1,14 @@
 import { loadConfig, type CompactConfig } from './config.js';
+import {
+  ConversationMessage,
+  ContentBlock,
+  TextBlock,
+  ToolUseBlock,
+  ToolResultBlock,
+  TokenUsage,
+  extractMessageText,
+  convertLegacyMessage
+} from './types.js';
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -90,29 +100,93 @@ export interface CompactionResult {
   formattedSummary: string;
   removedCount: number;
   savedTokens: number;
+  originalTokens: number;
+  compactedTokens: number;
 }
 
 /**
- * 估算消息的 Token 数量
+ * 估算消息的 Token 数量 (支持新旧两种消息格式)
  */
-export function estimateTokenCount(messages: Array<{ content?: string }>): number {
+export function estimateTokenCount(
+  messages: Array<{ content?: string } | ConversationMessage>
+): number {
   return messages.reduce((sum, msg) => {
+    // Check if it's the new ConversationMessage format
+    if ('blocks' in msg) {
+      const conversationMsg = msg as ConversationMessage;
+      return sum + estimateMessageTokens(conversationMsg);
+    }
+    // Legacy format
     const text = msg.content || '';
     return sum + Math.ceil(text.length / 4);
   }, 0);
 }
 
 /**
+ * 估算单个 ConversationMessage 的 Token 数量
+ */
+function estimateMessageTokens(message: ConversationMessage): number {
+  return message.blocks.reduce((sum, block) => {
+    switch (block.type) {
+      case 'text':
+        return sum + Math.ceil(block.text.length / 4) + 1;
+      case 'tool_use':
+        return sum + Math.ceil((block.name.length + block.input.length) / 4) + 1;
+      case 'tool_result':
+        return sum + Math.ceil((block.tool_name.length + block.output.length) / 4) + 1;
+      default:
+        return sum;
+    }
+  }, 0);
+}
+
+/**
+ * 计算会话中的实际 Token 使用量 (从 usage 元数据)
+ */
+export function calculateActualTokenUsage(messages: ConversationMessage[]): TokenUsage {
+  const total: TokenUsage = {
+    input_tokens: 0,
+    output_tokens: 0,
+    cache_creation_input_tokens: 0,
+    cache_read_input_tokens: 0
+  };
+
+  for (const msg of messages) {
+    if (msg.usage) {
+      total.input_tokens += msg.usage.input_tokens;
+      total.output_tokens += msg.usage.output_tokens;
+      total.cache_creation_input_tokens += msg.usage.cache_creation_input_tokens;
+      total.cache_read_input_tokens += msg.usage.cache_read_input_tokens;
+    }
+  }
+
+  return total;
+}
+
+/**
  * 从消息中自动提取时间线（Claw Code 风格：不依赖 LLM）
  */
-export function extractTimelineFromMessages(messages: Array<{ role: string; content?: string }>): string {
-  const timeline = messages
-    .slice(-10)
-    .filter(m => m.content && m.content.trim().length > 5)
+export function extractTimelineFromMessages(
+  messages: Array<{ role: string; content?: string } | ConversationMessage>
+): string {
+  const recentMessages = messages.slice(-10);
+
+  const timeline = recentMessages
+    .filter(m => {
+      const text = 'blocks' in m
+        ? extractMessageText(m as ConversationMessage)
+        : (m as any).content || '';
+      return text.trim().length > 5;
+    })
     .map(m => {
-      const content = m.content!.trim().substring(0, 60);
-      return `  - ${m.role}: ${content}${m.content!.length > 60 ? '...' : ''}`;
+      const text = 'blocks' in m
+        ? extractMessageText(m as ConversationMessage)
+        : (m as any).content || '';
+      const content = text.trim().substring(0, 60);
+      const role = m.role;
+      return `  - ${role}: ${content}${text.length > 60 ? '...' : ''}`;
     });
+
   return timeline.join('\n');
 }
 
@@ -186,23 +260,51 @@ ${mergedTimeline.map(t => `  - ${t.replace(/^- /, '')}`).join('\n')}
  * 生成会话摘要（Claw Code 风格：代码提取 + LLM 整理）
  */
 export async function generateSummary(
-  messages: Array<{ role: string; content?: string }>,
+  messages: Array<{ role: string; content?: string } | ConversationMessage>,
   config: CompactConfig
 ): Promise<string> {
-  const userCount = messages.filter(m => m.role === 'user').length;
-  const assistantCount = messages.filter(m => m.role === 'assistant').length;
-  const toolCount = messages.filter(m => m.role === 'tool').length;
+  // Convert legacy messages if needed
+  const normalizedMessages = messages.map(m =>
+    'blocks' in m ? m as ConversationMessage : convertLegacyMessage(m as any)
+  );
+
+  const userCount = normalizedMessages.filter(m => m.role === 'user').length;
+  const assistantCount = normalizedMessages.filter(m => m.role === 'assistant').length;
+  const toolCount = normalizedMessages.filter(m => m.role === 'tool').length;
 
   // 1. 代码先提取时间线（Claw Code 核心逻辑：不依赖 LLM）
   const autoTimeline = extractTimelineFromMessages(messages);
 
   // 2. 检查是否有旧摘要
   let existingSummary: string | undefined;
-  if (messages.length > 0 && messages[0].role === 'system') {
-    const systemContent = messages[0].content || '';
+  if (normalizedMessages.length > 0 && normalizedMessages[0].role === 'system') {
+    const systemContent = extractMessageText(normalizedMessages[0]);
     const match = systemContent.match(/Summary:\n([\s\S]*?)(?:\n\nRecent messages|Continue the conversation)/);
     if (match) {
       existingSummary = match[1].trim();
+    }
+  }
+
+  // 3. 提取工具使用信息
+  const toolNames = new Set<string>();
+  const fileCandidates = new Set<string>();
+
+  for (const msg of normalizedMessages) {
+    for (const block of msg.blocks) {
+      if (block.type === 'tool_use') {
+        toolNames.add(block.name);
+        // Extract file paths from tool input
+        const fileMatches = block.input.match(/[\/\w]+\.\w{2,4}/g);
+        if (fileMatches) fileMatches.forEach(f => fileCandidates.add(f));
+      }
+      if (block.type === 'tool_result') {
+        toolNames.add(block.tool_name);
+      }
+      if (block.type === 'text') {
+        // Extract file paths from text
+        const fileMatches = block.text.match(/[\/\w]+\.\w{2,4}/g);
+        if (fileMatches) fileMatches.forEach(f => fileCandidates.add(f));
+      }
     }
   }
 
@@ -211,7 +313,7 @@ export async function generateSummary(
 请严格总结以下对话历史的关键信息。必须包含以下所有字段。
 
 消息统计：
-- 总消息数：${messages.length}
+- 总消息数：${normalizedMessages.length}
 - 用户消息：${userCount}
 - 助手消息：${assistantCount}
 - 工具消息：${toolCount}
@@ -219,9 +321,15 @@ export async function generateSummary(
 **已提取的时间线（直接使用，不要修改）**:
 ${autoTimeline}
 
+**工具使用**:
+${toolNames.size > 0 ? Array.from(toolNames).join(', ') : '无'}
+
+**文件引用**:
+${fileCandidates.size > 0 ? Array.from(fileCandidates).slice(0, 8).join(', ') : '无'}
+
 输出格式（必须严格遵循）：
 <summary>
-- Scope: ${messages.length} earlier messages compacted (user=${userCount}, assistant=${assistantCount}, tool=${toolCount}).
+- Scope: ${normalizedMessages.length} earlier messages compacted (user=${userCount}, assistant=${assistantCount}, tool=${toolCount}).
 - Recent requests:
   - [根据最近消息推断的最近 3 个用户请求]
 - Pending work:
@@ -241,18 +349,18 @@ ${autoTimeline}
     max_tokens: 500,
     temperature: 0.1
   });
-  
+
   const rawSummary = extractSummaryContent(response.content);
-  
+
   // 4. 验证摘要结构
   if (!validateSummary(rawSummary)) {
     console.warn('[LLM] Generated summary missing required fields, using fallback with auto-timeline.');
     return `<summary>
-- Scope: ${messages.length} messages compacted.
+- Scope: ${normalizedMessages.length} messages compacted.
 - Recent requests: [Inferred]
 - Pending work: [Continue current task]
-- Key files: [See tool usage]
-- Tools used: [See tool usage]
+- Key files: ${fileCandidates.size > 0 ? Array.from(fileCandidates).slice(0, 5).join(', ') : '[See tool usage]'}
+- Tools used: ${toolNames.size > 0 ? Array.from(toolNames).join(', ') : '[See tool usage]'}
 - Key timeline:
 ${autoTimeline}
 </summary>`;
@@ -297,17 +405,19 @@ export function shouldCompact(messages: Array<{ content?: string }>, config: Com
  * 压缩会话
  */
 export async function compactSession(
-  messages: Array<{ role: string; content?: string }>,
+  messages: Array<{ role: string; content?: string } | ConversationMessage>,
   config: CompactConfig
 ): Promise<CompactionResult> {
   const totalTokens = estimateTokenCount(messages);
-  
+
   if (totalTokens <= config.max_tokens * 0.9) {
     return {
       summary: '',
       formattedSummary: '',
       removedCount: 0,
-      savedTokens: 0
+      savedTokens: 0,
+      originalTokens: totalTokens,
+      compactedTokens: totalTokens
     };
   }
 
@@ -323,11 +433,16 @@ export async function compactSession(
     const summaryTokens = Math.ceil(summary.length / 4);
     const savedTokens = oldTokens - summaryTokens;
 
+    // Calculate compacted session tokens
+    const compactedTokens = summaryTokens + estimateTokenCount(recentMessages);
+
     return {
       summary,
       formattedSummary,
       removedCount: oldMessages.length,
-      savedTokens
+      savedTokens,
+      originalTokens: totalTokens,
+      compactedTokens
     };
   } catch (error) {
     console.error('[Compact] Compression failed, returning original session:', error);
@@ -335,7 +450,9 @@ export async function compactSession(
       summary: '',
       formattedSummary: '',
       removedCount: 0,
-      savedTokens: 0
+      savedTokens: 0,
+      originalTokens: totalTokens,
+      compactedTokens: totalTokens
     };
   }
 }

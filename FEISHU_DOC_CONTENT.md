@@ -29,7 +29,7 @@
 
 ```bash
 # 从本地安装
-openclaw skills install /Users/lab/.openclaw/workspace/skills/session-compact
+openclaw skills install <project-root>
 
 # 从 GitHub 安装（发布后）
 openclaw skills install https://github.com/openclaw/skills/session-compact
@@ -209,7 +209,7 @@ openclaw compact --max-tokens 1000
 
 ```bash
 # 运行测试
-cd /Users/lab/.openclaw/workspace/skills/session-compact
+cd <project-root>
 npm test
 
 # 查看覆盖率

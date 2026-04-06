@@ -9,7 +9,7 @@ Intelligent session compression plugin for OpenClaw that automatically manages t
 - **Seamless Continuation**: Conversations continue without user intervention
 - **Fallback Protection**: Code-based extraction when LLM unavailable
 - **Recursive Compression**: Supports multiple compression cycles
-- **CLI Commands**: `openclaw compact`, `openclaw compact-status`, `openclaw compact-config`
+- **CLI Commands**: `openclaw compact`, `openclaw compact-status`, `openclaw compact-config`, `openclaw sessions`, `openclaw session-info`
 
 ## 🚀 Quick Start
 
@@ -95,6 +95,12 @@ openclaw compact-config max_tokens
 
 # Set config value (not persisted)
 openclaw compact-config max_tokens 5000
+
+# List all saved sessions
+openclaw sessions
+
+# Show detailed session information
+openclaw session-info --session-id my-session
 ```
 
 **Automatic Mode** (Recommended):
@@ -261,7 +267,7 @@ function estimateTokenCount(
 
 ```bash
 # Navigate to project
-cd /Users/lab/.openclaw/workspace/skills/session-compact
+cd <project-root>
 
 # Install dependencies
 npm install

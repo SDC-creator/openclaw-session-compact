@@ -2,7 +2,7 @@
 
 ## ✅ 项目概览
 
-**位置**: `/Users/lab/.openclaw/workspace/skills/session-compact`
+**位置**: `<project-root>` (e.g., `~/.openclaw/workspace/skills/session-compact`)
 
 **类型**: OpenClaw 插件 (npm 包)
 
@@ -79,7 +79,7 @@ export function register(api: any) {
 
 ### 本地开发
 ```bash
-cd /Users/lab/.openclaw/workspace/skills/session-compact
+cd <project-root>
 
 # 安装依赖
 npm install

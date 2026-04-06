@@ -71,11 +71,13 @@ describe('register()', () => {
     expect(mockApi.registerCli).toHaveBeenCalledTimes(1);
     const callArgs = mockApi.registerCli.mock.calls[0];
     expect(callArgs[1]).toEqual({
-      commands: ['compact', 'compact-status', 'compact-config'],
+      commands: ['compact', 'compact-status', 'compact-config', 'sessions', 'session-info'],
       descriptors: [
         { name: 'compact', description: 'Manually compact the current session history to save tokens' },
         { name: 'compact-status', description: 'Show current session token usage and compression status' },
         { name: 'compact-config', description: 'Show or update compact configuration' },
+        { name: 'sessions', description: 'List all saved sessions' },
+        { name: 'session-info', description: 'Show detailed session information' },
       ],
     });
   });
