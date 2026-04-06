@@ -2,6 +2,7 @@ node_modules/
 src/
 *.log
 .env
+.env.*
 .DS_Store
 test-*.ts
 *.tmp
@@ -9,3 +10,16 @@ test-*.ts
 !README.md
 !SKILL.md
 !DEVELOPMENT.md
+
+# Test artifacts
+coverage/
+
+# Internal documentation
+OPTIMIZATION_REPORT.md
+TEST_VERIFICATION_REPORT.md
+FEISHU_DOC_CONTENT.md
+GITHUB_RELEASE.md
+RELEASE_NOTES.md
+
+# Build config
+tsconfig.json
