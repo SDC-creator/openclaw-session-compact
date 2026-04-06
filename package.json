@@ -1,6 +1,6 @@
 {
   "name": "openclaw-session-compact",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Smart session compaction plugin for OpenClaw to manage token usage and support unlimited conversation length.",
   "type": "module",
   "main": "dist/index.js",
@@ -36,7 +36,7 @@
   },
   "openclaw": {
     "name": "Session Compact",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Automatically compresses session history to manage token limits.",
     "entry": "dist/index.js"
   },
