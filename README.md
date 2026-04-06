@@ -14,12 +14,19 @@ Intelligent session compression plugin for OpenClaw that automatically manages t
 
 ### 1. Installation
 
+**Recommended - Install via ClawHub:**
 ```bash
-# Install from local path
-openclaw skills install /Users/lab/.openclaw/workspace/skills/session-compact
+npx clawhub@latest install openclaw-session-compact
+```
 
-# Install from GitHub (after release)
-openclaw skills install https://github.com/openclaw/skills/session-compact
+**Alternative - Install from GitHub:**
+```bash
+openclaw skills install https://github.com/SDC-creator/openclaw-session-compact
+```
+
+**Local Development:**
+```bash
+openclaw skills install /path/to/session-compact
 ```
 
 ### 2. Configuration
@@ -306,8 +313,9 @@ openclaw compact --max-tokens 1000
 
 ## 📝 Changelog
 
-### v1.0.0 (2026-04-04)
+### v1.0.0 (2026-04-06)
 - ✨ Initial release
+- ✅ Published on ClawHub: https://clawhub.ai/sdc-creator/openclaw-session-compact
 - ✅ 65 unit tests passing
 - ✅ Compression functionality verified
 - ✅ Fallback mechanism validated

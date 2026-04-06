@@ -6,12 +6,19 @@
 
 ### 安装
 
+**推荐 - 通过 ClawHub 安装：**
 ```bash
-# 从本地安装
-openclaw skills install /Users/lab/.openclaw/workspace/skills/session-compact
+npx clawhub@latest install openclaw-session-compact
+```
 
-# 从 GitHub 安装（发布后）
-openclaw skills install https://github.com/openclaw/skills/session-compact
+**备选 - 从 GitHub 安装：**
+```bash
+openclaw skills install https://github.com/SDC-creator/openclaw-session-compact
+```
+
+**本地开发：**
+```bash
+openclaw skills install /path/to/session-compact
 ```
 
 ### 配置

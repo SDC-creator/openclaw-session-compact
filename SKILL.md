@@ -6,12 +6,19 @@ Intelligent session compression plugin for OpenClaw that automatically manages t
 
 ### Installation
 
+**Recommended - Install via ClawHub:**
 ```bash
-# Install from local path
-openclaw skills install /Users/lab/.openclaw/workspace/skills/session-compact
+npx clawhub@latest install openclaw-session-compact
+```
 
-# Install from GitHub (after release)
-openclaw skills install https://github.com/openclaw/skills/session-compact
+**Alternative - Install from GitHub:**
+```bash
+openclaw skills install https://github.com/SDC-creator/openclaw-session-compact
+```
+
+**Local Development:**
+```bash
+openclaw skills install /path/to/session-compact
 ```
 
 ### Configuration
