@@ -1,12 +1,21 @@
 ---
 name: openclaw-session-compact
 description: |
-  Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports unlimited-length conversations. Compresses historical messages into structured summaries to reduce token usage by 85-95%. Provides CLI commands: compact, compact-status, compact-config.
+  Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports unlimited-length conversations. Compresses historical messages into structured summaries to reduce token usage by 85-95%. Provides CLI commands: compact, compact-status, compact-config, sessions, session-info.
 ---
 
-# OpenClaw Session Compact Plugin
+# OpenClaw Session Compact Plugin v1.1.0
 
 Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports **unlimited-length conversations**. By automatically compressing historical messages into structured summaries, it significantly reduces token usage (typically 85-95% savings).
+
+## ✨ New in v1.1.0
+
+- **Session Persistence**: JSON file-based storage with version tracking
+- **Token Usage Tracking**: Actual API usage + cache token metrics
+- **Rich Message Structure**: ContentBlock types (text, tool_use, tool_result)
+- **Session Lifecycle Manager**: Auto-compaction, state management, events
+- **New CLI Commands**: `sessions`, `session-info`
+- **150 Tests Passing**: 82.78% coverage
 
 ## 🚀 Quick Start
 
