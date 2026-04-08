@@ -37,7 +37,9 @@ function getCurrentSessionMessages(): Array<{ role: string; content?: string }> 
  * OpenClaw plugin register function.
  */
 export function register(api: any) {
-  const config = loadConfig();
+  // 从 OpenClaw 配置系统读取配置
+  const pluginConfig = api.getConfig?.() || {};
+  const config = loadConfig(pluginConfig);
 
   // Register CLI commands
   api.registerCli(
