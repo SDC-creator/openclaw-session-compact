@@ -45,22 +45,22 @@ Add to `~/.openclaw/openclaw.json`:
   "plugins": {
     "allow": ["openclaw-session-compact"],
     "entries": {
-      "openclaw-session-compact": { "enabled": true }
-    }
-  },
-  "skills": {
-    "entries": {
       "openclaw-session-compact": {
         "enabled": true,
-        "max_tokens": 10000,
-        "preserve_recent": 4,
-        "auto_compact": true,
-        "model": "qwen/qwen3.5-122b-a10b"
+        "max_tokens": 5000,
+        "preserve_recent": 6
       }
     }
   }
 }
 ```
+
+**重要**：配置参数从 OpenClaw 配置系统读取。修改配置后需要重启 Gateway：
+
+```bash
+openclaw gateway restart
+```
+
 
 ## 💡 Usage Scenarios
 
