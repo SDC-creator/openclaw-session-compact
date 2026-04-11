@@ -249,6 +249,6 @@ MIT License
 **项目状态**: ✅ 稳定发布
 **测试状态**: ✅ 94/94 通过
 **覆盖率**: 📈 94.65%
-**ClawHub**: ✅ 已发布 (openclaw-session-compact@1.0.0)
+**ClawHub**: ✅ 已发布 (openclaw-session-compact@1.2.0)
 **版本**: v1.0.0
 **维护者**: SDC-creator

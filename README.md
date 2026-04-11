@@ -475,6 +475,13 @@ openclaw compact-config max_tokens 1000
 
 ## 📝 Changelog
 
+### v1.2.0 (2026-04-11)
+- 🐛 **Fixed**: Configuration persistence — `loadFromOpenClawConfig()` correctly reads from `plugins.entries.<id>.config`
+- ✨ **Added**: 16 comprehensive test cases for OpenClaw config loading (163 total tests)
+- 📝 **Improved**: README with step-by-step installation guide and troubleshooting
+- 🔧 **Updated**: Dependencies — `openclaw` → 2026.4.9, `basic-ftp` → 5.2.2
+- 🔧 **Updated**: `openclaw.build.openclawVersion` → 2026.4.9
+
 ### v1.1.0 (2026-04-11)
 - 🐛 **Fixed**: Configuration persistence issue - parameters now correctly persist to `openclaw.json`
 - ✨ **Added**: `loadFromOpenClawConfig()` function for proper configuration handling
@@ -513,7 +520,7 @@ MIT License
 **Project Status**: ✅ Stable Release
 **Tests**: ✅ 94/94 Passing
 **Coverage**: 📈 94.65%
-**ClawHub**: ✅ Published (openclaw-session-compact@1.0.0)
+**ClawHub**: ✅ Published (openclaw-session-compact@1.2.0)
 **Maintainer**: SDC-creator
 
 **Chinese Documentation**: [SKILL_CN.md](SKILL_CN.md)

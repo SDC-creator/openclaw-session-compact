@@ -264,6 +264,6 @@ MIT License
 **Status**: ✅ Stable Release
 **Tests**: ✅ 94/94 Passing
 **Coverage**: 📈 94.65%
-**ClawHub**: ✅ Published (openclaw-session-compact@1.0.0)
+**ClawHub**: ✅ Published (openclaw-session-compact@1.2.0)
 **Version**: v1.0.0
 **Maintainer**: SDC-creator
