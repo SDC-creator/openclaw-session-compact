@@ -23,10 +23,19 @@ jest.mock('../compact/config.js', () => ({
     auto_compact: true,
     model: '',
   })),
+  loadFromOpenClawConfig: jest.fn((pluginConfig = {}) => {
+    const config = pluginConfig?.config || pluginConfig || {};
+    return {
+      max_tokens: config.max_tokens ?? 10000,
+      preserve_recent: config.preserve_recent ?? 4,
+      auto_compact: config.auto_compact ?? true,
+      model: config.model ?? '',
+    };
+  }),
 }));
 
 import { estimateTokenCount, shouldCompact, compactSession, getCurrentModel } from '../compact/engine.js';
-import { loadConfig } from '../compact/config.js';
+import { loadConfig, loadFromOpenClawConfig } from '../compact/config.js';
 
 function createMockProgram() {
   const commands = new Map<string, any>();
@@ -241,9 +250,9 @@ describe('register()', () => {
     });
 
     it('should use configured model when set', () => {
-      // The register() function calls loadConfig() once at registration time.
+      // The register() function calls loadFromOpenClawConfig() once at registration time.
       // To test with a custom model, we need to re-register with a fresh mock.
-      (loadConfig as jest.Mock).mockReturnValue({
+      (loadFromOpenClawConfig as jest.Mock).mockReturnValue({
         max_tokens: 10000,
         preserve_recent: 4,
         auto_compact: true,
