@@ -22,23 +22,32 @@ Intelligent session compression plugin for OpenClaw that automatically manages t
 clawhub install openclaw-session-compact
 ```
 
-**Manual installation** (if ClawHub install doesn't support code plugins yet):
+**Manual installation** (if ClawHub is not available):
+
+> ⚠️ **Important**: This plugin requires compilation. Do not skip the build step!
 
 ```bash
-# Clone or download the plugin
+# Step 1: Clone the plugin
 git clone https://github.com/SDC-creator/openclaw-session-compact.git \
   ~/.openclaw/extensions/openclaw-session-compact
 
-# Install dependencies
+# Step 2: Install dependencies
 cd ~/.openclaw/extensions/openclaw-session-compact
 npm install --production
+
+# Step 3: Build the plugin (TypeScript → JavaScript)
+npm run build
+
+# Step 4: Verify the build
+ls dist/index.js  # Should exist
 ```
 
+**Troubleshooting**:
+- If you see `plugin not found` error, ensure `dist/` directory exists
+- If build fails, check Node.js version (requires v18+ or v22+)
+
 ### 2. Plugin Configuration
-
-The plugin is automatically discovered from `~/.openclaw/extensions/openclaw-session-compact/`.
-
-Add to `~/.openclaw/openclaw.json`:
+After installation, configure the plugin in `~/.openclaw/openclaw.json`:
 
 ```json
 {
@@ -53,9 +62,19 @@ Add to `~/.openclaw/openclaw.json`:
 }
 ```
 
-### 3. Compression Configuration
+### 3. Restart Gateway
+```bash
+openclaw gateway restart
+```
 
-Add to `~/.openclaw/openclaw.json`:
+### 4. Verify Installation
+```bash
+openclaw status | grep session-compact
+# Expected output: "openclaw-session-compact: loaded"
+```
+
+### 5. Compression Configuration (Optional)
+Configure compression behavior in `~/.openclaw/openclaw.json`:
 
 ```json
 {
