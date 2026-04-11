@@ -73,23 +73,48 @@ openclaw status | grep session-compact
 # Expected output: "openclaw-session-compact: loaded"
 ```
 
-### 5. Compression Configuration (Optional)
+### 3. Compression Configuration (Optional)
+
 Configure compression behavior in `~/.openclaw/openclaw.json`:
 
 ```json
 {
-  "skills": {
+  "plugins": {
     "entries": {
       "openclaw-session-compact": {
         "enabled": true,
-        "max_tokens": 10000,
-        "preserve_recent": 4,
-        "auto_compact": true,
-        "model": "qwen/qwen3.5-122b-a10b"
+        "config": {
+          "max_tokens": 10000,
+          "preserve_recent": 4,
+          "auto_compact": true,
+          "model": ""
+        }
       }
     }
   }
 }
+```
+
+**Using CLI to set configuration** (recommended):
+
+```bash
+# Set max_tokens threshold
+openclaw config set plugins.entries.openclaw-session-compact.config.max_tokens 10000 --strict-json
+
+# Set preserve_recent
+openclaw config set plugins.entries.openclaw-session-compact.config.preserve_recent 4 --strict-json
+
+# Set auto_compact
+openclaw config set plugins.entries.openclaw-session-compact.config.auto_compact true --strict-json
+
+# Restart gateway to apply changes
+openclaw gateway restart
+```
+
+**View current configuration**:
+
+```bash
+openclaw config get plugins.entries.openclaw-session-compact.config
 ```
 
 ### 4. Usage
@@ -449,6 +474,15 @@ openclaw compact-config max_tokens 1000
 ```
 
 ## 📝 Changelog
+
+### v1.1.0 (2026-04-11)
+- 🐛 **Fixed**: Configuration persistence issue - parameters now correctly persist to `openclaw.json`
+- ✨ **Added**: `loadFromOpenClawConfig()` function for proper configuration handling
+- ✨ **Added**: Debug logging for configuration troubleshooting
+- 📝 **Updated**: README with correct configuration path (`plugins.entries.<id>.config`)
+- 📝 **Updated**: Configuration examples using `openclaw config set` CLI commands
+- 🔧 **Improved**: Default `max_tokens` increased from 5000 to 10000
+- ✅ **Verified**: Configuration loading and persistence working correctly
 
 ### v1.0.0 (2026-04-06)
 - ✨ Initial release

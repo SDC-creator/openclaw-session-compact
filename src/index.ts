@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { loadConfig } from './compact/config.js';
+import { loadConfig, loadFromOpenClawConfig } from './compact/config.js';
 import {
   compactSession,
   estimateTokenCount,
@@ -39,7 +39,15 @@ function getCurrentSessionMessages(): Array<{ role: string; content?: string }> 
 export function register(api: any) {
   // 从 OpenClaw 配置系统读取配置
   const pluginConfig = api.getConfig?.() || {};
-  const config = loadConfig(pluginConfig);
+  
+  // 调试日志：查看 api.getConfig() 返回的内容
+  console.error('[DEBUG] api.getConfig() returned:', JSON.stringify(pluginConfig, null, 2));
+  
+  // 使用新的 loadFromOpenClawConfig 函数，正确解析配置
+  // pluginConfig 可能包含在 plugins.entries 或 skills.entries 中
+  const config = loadFromOpenClawConfig(pluginConfig);
+  
+  console.error('[DEBUG] Final config:', JSON.stringify(config, null, 2));
 
   // Register CLI commands
   api.registerCli(
