@@ -1,6 +1,44 @@
-# OpenClaw Session Compact Plugin 🔄
+# OpenClaw Session Compact Plugin --Obsoleted
+
+
+  OpenClaw Gateway has supported session compact function
+
+  Preemptive Compaction — 在每次发送 prompt 到 LLM 之前自动检查：
+
+  函数: shouldPreemptivelyCompactBeforePrompt()
+  计算: estimatedPromptTokens vs (contextTokenBudget - reserveTokens)
+
+  路由选择:
+  - "fits"                    → 不需要压缩
+  - "compact_only"            → 只压缩旧消息
+  - "truncate_tool_results_only" → 只截断工具结果
+  - "compact_then_truncate"  → 两者都做
+
+  关键配置
+
+  ┌────────────────────────────────────────────────────────┬──────────────────────────┐
+  │                          参数                          │           说明           │
+  ├────────────────────────────────────────────────────────┼──────────────────────────┤
+  │ agents.defaults.compaction.reserveTokens               │ 保留 token 余量          │
+  ├────────────────────────────────────────────────────────┼──────────────────────────┤
+  │ agents.defaults.compaction.reserveTokensFloor          │ 最小保留 token 下限      │
+  ├────────────────────────────────────────────────────────┼──────────────────────────┤
+  │ agents.defaults.compaction.memoryFlush.thresholdTokens │ 触发预压缩内存刷写的阈值 │
+  └────────────────────────────────────────────────────────┴──────────────────────────┘
+
+  手动触发
+
+  # CLI
+  openclaw sessions compact <session-key>
+
+  # API
+  sessions.compact({ key: "agent:main:main" })
+
+-------------------------------------------------------------------------------------
 
 Intelligent session compression plugin for OpenClaw that automatically manages token consumption and supports **unlimited-length conversations**. By automatically compressing historical messages into structured summaries, it significantly reduces token usage (typically 85-95% savings).
+
+
 
 ## ✨ Key Features
 
